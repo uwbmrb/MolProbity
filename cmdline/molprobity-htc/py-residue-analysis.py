@@ -222,55 +222,55 @@ def residue_analysis_old(files, quiet):
 def setup_nmrstar(header, output_str, filename, sans_loc):
   import bmrb
   #if os.path.isfile(output_str):
-  #  saver = bmrb.saveframe.fromFile(output_str)
-  #  loop = saver.getLoopByCategory("Residue_analysis")
+  #  saver = bmrb.Saveframe.from_file(output_str)
+  #  loop = saver.get_loop_by_category("Residue_analysis")
   #else:
 
   if not os.path.isfile(output_str):
-    entrier = bmrb.entry.fromScratch((os.path.basename(filename)[:-4])[:4]+"_residue")
-    software_saver = bmrb.saveframe.fromScratch("MolProbity", "Software")
-    software_saver.addTag("Sf_category", "software")
-    software_saver.addTag("Sf_framecode", "MolProbity")
-    software_saver.addTag("Entry_ID", "?")
-    software_saver.addTag("ID", "1")
-    software_saver.addTag("Name", "MolProbity")
-    software_saver.addTag("Version", "4.0")
-    software_saver.addTag("Details", ".")
-    software_saver2 = bmrb.saveframe.fromScratch("CYRANGE", "Software")
-    software_saver2.addTag("Sf_category", "software")
-    software_saver2.addTag("Sf_framecode", "CYRANGE")
-    software_saver2.addTag("Entry_ID", "?")
-    software_saver2.addTag("ID", "2")
-    software_saver2.addTag("Name", "CYRANGE")
-    software_saver2.addTag("Version", "2.0")
-    software_saver2.addTag("Details", ".")
-    entrier.addSaveframe(software_saver)
-    entrier.addSaveframe(software_saver2)
+    entrier = bmrb.Entry.from_scratch((os.path.basename(filename)[:-4])[:4]+"_residue")
+    software_saver = bmrb.Saveframe.from_scratch("MolProbity", "Software")
+    software_saver.add_tag("Sf_category", "software")
+    software_saver.add_tag("Sf_framecode", "MolProbity")
+    software_saver.add_tag("Entry_ID", "?")
+    software_saver.add_tag("ID", "1")
+    software_saver.add_tag("Name", "MolProbity")
+    software_saver.add_tag("Version", "4.0")
+    software_saver.add_tag("Details", ".")
+    software_saver2 = bmrb.Saveframe.from_scratch("CYRANGE", "Software")
+    software_saver2.add_tag("Sf_category", "software")
+    software_saver2.add_tag("Sf_framecode", "CYRANGE")
+    software_saver2.add_tag("Entry_ID", "?")
+    software_saver2.add_tag("ID", "2")
+    software_saver2.add_tag("Name", "CYRANGE")
+    software_saver2.add_tag("Version", "2.0")
+    software_saver2.add_tag("Details", ".")
+    entrier.add_saveframe(software_saver)
+    entrier.add_saveframe(software_saver2)
 
-    saver = bmrb.saveframe.fromScratch("Structure_validation_residue", "Structure_validation_residue")
-    saver.addTag("Sf_category", "structure_validation")
-    saver.addTag("Sf_framecode", "Structure_validation_residue")
-    saver.addTag("Entry_ID", "?")
-    saver.addTag("List_ID", "1")
-    #saver.addTag("Software_label", "molprobity")
-    #saver.addTag("Software_version", "4.0")
-    #saver.addTag("File_name", os.path.basename(filename))
-    saver.addTag("PDB_accession_code", (os.path.basename(filename)[:-4])[:4])
-    saver.addTag("Date_analyzed", datetime.date.today().isoformat())
-    entrier.addSaveframe(saver)
+    saver = bmrb.Saveframe.from_scratch("Structure_validation_residue", "Structure_validation_residue")
+    saver.add_tag("Sf_category", "structure_validation")
+    saver.add_tag("Sf_framecode", "Structure_validation_residue")
+    saver.add_tag("Entry_ID", "?")
+    saver.add_tag("List_ID", "1")
+    #saver.add_tag("Software_label", "molprobity")
+    #saver.add_tag("Software_version", "4.0")
+    #saver.add_tag("File_name", os.path.basename(filename))
+    saver.add_tag("PDB_accession_code", (os.path.basename(filename)[:-4])[:4])
+    saver.add_tag("Date_analyzed", datetime.date.today().isoformat())
+    entrier.add_saveframe(saver)
 
-    software_loop = bmrb.loop.fromScratch(category="Residue_analysis_software")
+    software_loop = bmrb.Loop.from_scratch(category="Residue_analysis_software")
     loop_tags = ["Software_ID", "Software_label", "Method_ID", "Method_label", "Entry_ID", "Structure_validation_oneline_list_ID"]
-    software_loop.addColumn(loop_tags)
-    software_loop.addData(["1", "MolProbity", ".", ".", "?", "1"])
-    software_loop.addData(["2", "CYRANGE", ".", ".", "?", "1"])
-    saver.addLoop(software_loop)
+    software_loop.add_columns(loop_tags)
+    software_loop.add_data(["1", "MolProbity", ".", ".", "?", "1"])
+    software_loop.add_data(["2", "CYRANGE", ".", ".", "?", "1"])
+    saver.add_loop(software_loop)
 
     with open(output_str[:-4]+".header", "a+") as str_write:
       str_write.write(str(entrier))
-  loop = bmrb.loop.fromScratch(category="Residue_analysis")
+  loop = bmrb.Loop.from_scratch(category="Residue_analysis")
   header = ["ID"]+header
-  loop.addColumn(header)
+  loop.add_columns(header)
   return loop
 #}}}
 
@@ -279,9 +279,9 @@ def write_nmrstar(output_str, loop):
   print_header = False
   if not os.path.isfile(output_str):
     print_header = True
-  #  saver.addLoop(loop)
-  #print loop.getDataAsCSV(print_header, True)
-  loop_csv = loop.getDataAsCSV(print_header, True)
+  #  saver.add_loop(loop)
+  #print loop.get_data_as_csv(print_header, True)
+  loop_csv = loop.get_data_as_csv(print_header, True)
   with open(output_str, 'a+') as str_write:
     str_write.write(loop_csv)
   #print saver
@@ -552,7 +552,7 @@ def residue_analysis(files, quiet, sans_location):
     csv_out.append(":".join(str(e) for e in out))
     if sans_location:
       #add an extra column on front for the "Residue_analysis.ID" for possible use as a primary key
-      loop.addData(["."]+(["." if x=="" else x for x in out][2:]))
+      loop.add_data(["."]+(["." if x=="" else x for x in out][2:]))
 
   output_file = (os.path.basename(files[0])[:-4])[:4]+"-"+files[16]+"-residue.csv"
 
