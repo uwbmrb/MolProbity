@@ -261,7 +261,7 @@ def setup_nmrstar(header, output_str, filename, sans_loc):
 
     software_loop = bmrb.Loop.from_scratch(category="Residue_analysis_software")
     loop_tags = ["Software_ID", "Software_label", "Method_ID", "Method_label", "Entry_ID", "Structure_validation_oneline_list_ID"]
-    software_loop.add_columns(loop_tags)
+    software_loop.add_column(loop_tags)
     software_loop.add_data(["1", "MolProbity", ".", ".", "?", "1"])
     software_loop.add_data(["2", "CYRANGE", ".", ".", "?", "1"])
     saver.add_loop(software_loop)
@@ -270,7 +270,7 @@ def setup_nmrstar(header, output_str, filename, sans_loc):
       str_write.write(str(entrier))
   loop = bmrb.Loop.from_scratch(category="Residue_analysis")
   header = ["ID"]+header
-  loop.add_columns(header)
+  loop.add_column(header)
   return loop
 #}}}
 
