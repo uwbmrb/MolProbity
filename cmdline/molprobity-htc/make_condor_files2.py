@@ -245,6 +245,7 @@ def divide_pdbs(in_dir, outdir, size_limit):
 #{{{ split_pdbs_to_dirs
 # splits pdbs into separated models in the pdb/orig directory
 def split_pdbs_to_dirs(outdir, list_of_pdblists):
+  print("in split_pdbs_to_dirs")
   for indx, pdbs in enumerate(list_of_pdblists):
     num = '{0:0>4}'.format(indx)
     numpath = os.path.join(outdir, "pdbs", num)
@@ -256,7 +257,7 @@ def split_pdbs_to_dirs(outdir, list_of_pdblists):
     os.makedirs(rednobuildpath)
     os.makedirs(redbuildpath)
     for pdb_file in pdbs:
-      #print pdb_file
+      print pdb_file
       if (not os.path.isdir(pdb_file)):
         root, ext = os.path.splitext(pdb_file)
         if (ext == ".pdb"):
@@ -543,8 +544,8 @@ reduce_sub = """universe = vanilla
 Notify_user  = vbchen@bmrb.wisc.edu
 notification = Error
 
-job_machine_attrs = Machine
-job_machine_attrs_history_length = 5
+#job_machine_attrs = Machine
+#job_machine_attrs_history_length = 5
 
 periodic_release = HoldReasonCode == 13 && HoldReasonSubCode == 2 && JobRunCount < 5
 
@@ -743,8 +744,8 @@ analyze_sub = """universe = vanilla
 Notify_user  = vbchen@bmrb.wisc.edu
 notification = Error
 
-job_machine_attrs = Machine
-job_machine_attrs_history_length = 5
+#job_machine_attrs = Machine
+#job_machine_attrs_history_length = 5
 
 periodic_release = HoldReasonCode == 13 && HoldReasonSubCode == 2 && JobRunCount < 5
 
@@ -783,8 +784,8 @@ post_star_sub = """universe = vanilla
 Notify_user  = vbchen@bmrb.wisc.edu
 notification = Error
 
-job_machine_attrs = Machine
-job_machine_attrs_history_length = 5
+#job_machine_attrs = Machine
+#job_machine_attrs_history_length = 5
 
 periodic_release = HoldReasonCode == 13 && HoldReasonSubCode == 2 && JobRunCount < 5
 
@@ -836,21 +837,21 @@ for pdb_code in pdb_set:
     # stitch together the oneline star files
     orig_star = pdb_code+"-origoneline.str"
     if os.path.exists(orig_star):
-        orig_entry = bmrb.entry.fromFile(orig_star)
+        orig_entry = bmrb.Entry.from_file(orig_star)
         orig_saver = orig_entry.getSaveframeByName("Structure_validation_oneline")
         orig_loops = orig_saver.getLoopByCategory("Oneline_analysis")
         #print orig_loops[0]
-        loop_csv = orig_loops.getDataAsCSV()
+        loop_csv = orig_loops.get_data_as_csv()
         #print orig_saver
         del orig_saver[orig_loops]
         #print orig_saver
     for buildtype in ("build", "nobuild"):
         oneline_star = pdb_code+"-"+buildtype+"oneline.str"
         if os.path.exists(oneline_star):
-            oneline_entrier = bmrb.entry.fromFile(oneline_star)
-            build_loops = oneline_entrier.getLoopsByCategory("Oneline_analysis")
-            loop_csv = loop_csv + build_loops[0].getDataAsCSV(False, False)
-    orig_saver.addLoop(bmrb.loop.fromString(loop_csv, csv=True))
+            oneline_entrier = bmrb.Entry.from_file(oneline_star)
+            build_loops = oneline_entrier.get_loops_by_category("Oneline_analysis")
+            loop_csv = loop_csv + build_loops[0].get_data_as_csv(False, False)
+    orig_saver.add_loop(bmrb.Loop.from_string(loop_csv, csv=True))
     with open(pdb_code+"-oneline.str", 'w+') as str_write:
         str_write.write(str(orig_entry))
 
@@ -858,8 +859,8 @@ for pdb_code in pdb_set:
     residue_header = pdb_code+"-orig-residue-str.header"
     print residue_header
     if os.path.exists(residue_header):
-        entrier = bmrb.entry.fromFile(residue_header)
-        saver = entrier.getSaveframeByName("Structure_validation_residue")
+        entrier = bmrb.Entry.from_file(residue_header)
+        saver = entrier.get_saveframe_by_name("Structure_validation_residue")
     else:
         sys.stderr.write("# ERROR: saveframe header file missing for: " + pdb_code+"\\n")
         sys.exit(1)
@@ -867,18 +868,18 @@ for pdb_code in pdb_set:
     for buildtype in ("orig", "build", "nobuild"):
         star_csv = pdb_code+"-"+buildtype+"-residue-str.csv"
         if os.path.exists(star_csv):
-            loop = bmrb.loop.fromFile(star_csv, True)
-            #cat_loop = cat_loop+loop.getDataAsCSV()
+            loop = bmrb.Loop.from_file(star_csv, True)
+            #cat_loop = cat_loop+loop.get_data_as_csv()
             if cat_loop == "":
-                cat_loop = cat_loop+loop.getDataAsCSV()
+                cat_loop = cat_loop+loop.get_data_as_csv()
             else:
-                cat_loop = cat_loop+loop.getDataAsCSV(False, False)
+                cat_loop = cat_loop+loop.get_data_as_csv(False, False)
 
         else:
             sys.stderr.write("# ERROR: loop file missing for: " + pdb_code+"\\n")
             sys.exit(1)
 
-    saver.addLoop(bmrb.loop.fromString(cat_loop, True))
+    saver.add_loop(bmrb.Loop.from_string(cat_loop, True))
     with open(pdb_code+"-residue.str", 'w+') as str_write:
         str_write.write(str(entrier))
 
@@ -887,13 +888,13 @@ for pdb_code in pdb_set:
     #    star_csv = os.path.join(base_path, pdb_code+"-residue-str.csv")
     #    star_save = os.path.join(base_path, pdb_code+"-residue-str.csv.header")
     #    if os.path.exists(star_save):
-    #        saver = bmrb.saveframe.fromFile(star_save, True)
+    #        saver = bmrb.Saveframe.from_file(star_save, True)
     #    else:
     #        sys.stderr.write("# ERROR: saveframe header file missing for: " + pdb_code+"\\n")
     #        sys.exit(1)
     #    if os.path.exists(star_csv):
-    #        loop = bmrb.loop.fromFile(star_csv, True)
-    #        saver.addLoop(loop)
+    #        loop = bmrb.Loop.from_file(star_csv, True)
+    #        saver.add_loop(loop)
     #    else:
     #        sys.stderr.write("# ERROR: loop file missing for: " + pdb_code+"\\n")
     #        sys.exit(1)
@@ -947,6 +948,7 @@ rm -rf pdbs/
 
 #{{{ prep_dirs
 def prep_dirs(indir, update_scripts=False):
+  print("in prep_dirs")
   if not os.path.exists(indir):
     sys.stderr.write(indir + " does not seem to exist!\n")
   else:
@@ -959,6 +961,7 @@ def prep_dirs(indir, update_scripts=False):
       os.makedirs(outdir)
       os.makedirs(os.path.join(outdir,"logs"))
       os.makedirs(os.path.join(outdir,"results"))
+      print("Directory location: %s" % outdir)
       os.makedirs(os.path.join(outdir,"pdbs"))
     elif update_scripts:
       for tst_file in os.listdir(outdir):
@@ -977,6 +980,7 @@ def prep_dirs(indir, update_scripts=False):
 
 #{{{ make_files
 def make_files(indir, outdir, file_size_limit, bond_type, sans_location, do_requirement, update_scripts=False, update_bmrb_loc="none"):
+  print("in make_files")
   molprobity_home = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
   #print "mp home: " + molprobity_home
   #print "indir: " + indir
@@ -996,14 +1000,18 @@ def make_files(indir, outdir, file_size_limit, bond_type, sans_location, do_requ
   #  build = "build"
   #print do_requirement
   if do_requirement == "bmrb":
-    reduce_req = "requirements = ((TARGET.FileSystemDomain == \"bmrb.wisc.edu\") || (TARGET.FileSystemDomain == \".bmrb.wisc.edu\"))\n+RosettaJob=True"
-    analysis_req = "requirements = ((TARGET.FileSystemDomain == \"bmrb.wisc.edu\") || (TARGET.FileSystemDomain == \".bmrb.wisc.edu\") && HasJava)\n+RosettaJob=True"
+    reduce_req = 'requirements = COLLECTOR_HOST_STRING == "exocet.bmrb.wisc.edu"'
+    analysis_req = 'requirements = HasJava && COLLECTOR_HOST_STRING == "exocet.bmrb.wisc.edu"'
+
+    #reduce_req = "requirements = ((TARGET.FileSystemDomain == \"bmrb.wisc.edu\") || (TARGET.FileSystemDomain == \".bmrb.wisc.edu\"))\n+RosettaJob=True"
+    #analysis_req = "requirements = ((TARGET.FileSystemDomain == \"bmrb.wisc.edu\") || (TARGET.FileSystemDomain == \".bmrb.wisc.edu\") && HasJava)\n+RosettaJob=True"
   else:
-    reduce_req = "requirements = (OpSys == \"LINUX\" && Arch == \"X86_64\")"
-    analysis_req = "requirements = (HasJava && OpSys == \"LINUX\" && Arch == \"X86_64\")"
-  for i in range(1,6):
-    reduce_req = reduce_req+" && target.machine =!= MachineAttrMachine"+str(i)
-    analysis_req = analysis_req+" && target.machine =!= MachineAttrMachine"+str(i)
+    reduce_req = 'requirements = (OpSys == "LINUX" && Arch == "X86_64") && COLLECTOR_HOST_STRING == "exocet.bmrb.wisc.edu"'
+    analysis_req = 'requirements = (HasJava && OpSys == "LINUX" && Arch == "X86_64") && COLLECTOR_HOST_STRING == "exocet.bmrb.wisc.edu"'
+  # Jon Wedell October 16 - This slows us down locally
+  #for i in range(1,6):
+    #reduce_req = reduce_req+" && target.machine =!= MachineAttrMachine"+str(i)
+    #analysis_req = analysis_req+" && target.machine =!= MachineAttrMachine"+str(i)
   #print condor_req+" is req"
   ana_opt = ""
   sans_file_transfer = ""
