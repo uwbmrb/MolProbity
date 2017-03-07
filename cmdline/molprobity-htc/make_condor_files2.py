@@ -838,8 +838,8 @@ for pdb_code in pdb_set:
     orig_star = pdb_code+"-origoneline.str"
     if os.path.exists(orig_star):
         orig_entry = bmrb.Entry.from_file(orig_star)
-        orig_saver = orig_entry.getSaveframeByName("Structure_validation_oneline")
-        orig_loops = orig_saver.getLoopByCategory("Oneline_analysis")
+        orig_saver = orig_entry.get_saveframe_by_name("Structure_validation_oneline")
+        orig_loops = orig_saver.get_loop_by_category("Oneline_analysis")
         #print orig_loops[0]
         loop_csv = orig_loops.get_data_as_csv()
         #print orig_saver
